@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Api } from '../service/api';
@@ -13,7 +13,12 @@ import { Api } from '../service/api';
 export class Register {
   registerForm: FormGroup;
   error: string = '';
-  constructor(private formBuilder: FormBuilder, private apiService: Api, private router: Router) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private apiService: Api,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {
     this.registerForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
@@ -32,10 +37,12 @@ export class Register {
           this.router.navigate(['/login']);
         } else {
           this.error = res.message || 'Registration not succesful';
+          this.cdr.detectChanges();
         }
       },
       error: (error: any) => {
         this.error = error.error?.message || error.message;
+        this.cdr.detectChanges();
       },
     });
   }
